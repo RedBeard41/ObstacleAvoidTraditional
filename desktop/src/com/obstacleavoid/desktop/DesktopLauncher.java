@@ -6,10 +6,11 @@ import com.obstacleavoid.ObstacleAvoidGame;
 import com.obstacleavoid.config.GameConfig;
 
 public class DesktopLauncher {
-	public static void main (String[] arg) {
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.width = (int) GameConfig.WIDTH;
-		config.height = (int) GameConfig.HEIGHT;
-		new LwjglApplication(new ObstacleAvoidGame(), config);
-	}
+    public static void main(String[] arg) {
+        LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+        config.width = (int) GameConfig.WIDTH;
+        config.height = (int) GameConfig.HEIGHT;
+
+        new LwjglApplication(new ObstacleAvoidGame(), config);
+    }
 }
