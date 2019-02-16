@@ -68,6 +68,7 @@ public class DebugCameraConfig {
 
     private FileHandle fileHandle;
 
+
     //constructor
 
     public DebugCameraConfig() {

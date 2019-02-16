@@ -1,17 +1,28 @@
 package com.obstacleavoid.Screen;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
+import com.obstacleavoid.config.GameConfig;
 
 public class GameScreen implements Screen {
 
     private GameController gameController;
     private GameRenderer renderer;
+    private GameInput gameInput;
+    private Viewport gameViewPort;
 
 
     @Override
     public void show() {
-        gameController = new GameController();
-        renderer = new GameRenderer(gameController);
+        gameViewPort = new FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT);
+        gameInput = new GameInput(gameViewPort);
+        gameController = new GameController(gameInput);
+        renderer = new GameRenderer(gameController,gameViewPort);
+
+        Gdx.input.setInputProcessor(gameInput);
+
 
     }
 

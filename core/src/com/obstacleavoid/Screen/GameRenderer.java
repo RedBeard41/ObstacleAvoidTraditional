@@ -2,6 +2,7 @@ package com.obstacleavoid.Screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -10,6 +11,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.obstacleavoid.Entity.Background;
 import com.obstacleavoid.Entity.Obstacle;
 import com.obstacleavoid.Entity.Player;
 import com.obstacleavoid.assets.AssetPaths;
@@ -34,15 +36,23 @@ public class GameRenderer implements Disposable {
     private final GlyphLayout layout = new GlyphLayout();
     private DebugCameraController debugCameraController;
     private final GameController gameController;
+    private GameInput gameInput;
 
-    public GameRenderer(GameController gameController) {
+    private Texture playerTexture;
+    private Texture obstacleTexture;
+    private Texture backgroundTexture;
+
+    public GameRenderer(GameController gameController, Viewport viewport) {
+        this.viewport = viewport;
         this.gameController = gameController;
+
         init();
     }
 
     private void init(){
         camera = new OrthographicCamera();
-        viewport = new FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera);
+        viewport.setCamera(camera);
+
         renderer = new ShapeRenderer();
 
         hudCamera = new OrthographicCamera();
@@ -53,6 +63,11 @@ public class GameRenderer implements Disposable {
         //create debug camera controller
         debugCameraController = new DebugCameraController();
         debugCameraController.setStartPosition(GameConfig.WORLD_CENTER_X, GameConfig.WORLD_CENTER_Y);
+
+        playerTexture = new Texture(Gdx.files.internal("gameplay/player.png"));
+        obstacleTexture = new Texture(Gdx.files.internal("gameplay/obstacle.png"));
+        backgroundTexture = new Texture(Gdx.files.internal("gameplay/background.png"));
+
     }
 
     //public methods
@@ -67,12 +82,16 @@ public class GameRenderer implements Disposable {
         //clear screen
         GdxUtils.clearScreen();
 
+        //render gameplay
+        renderGamePlay();
+
         //render UI
         renderUI();
 
         //render debug graphics
         renderDebug();
     }
+
 
 
 
@@ -87,9 +106,47 @@ public class GameRenderer implements Disposable {
         renderer.dispose();
         batch.dispose();
         font.dispose();
+        playerTexture.dispose();
+        obstacleTexture.dispose();
+        backgroundTexture.dispose();
     }
 
+
+
     //private methods
+
+
+    private void renderGamePlay() {
+        viewport.apply();
+        batch.setProjectionMatrix(camera.combined);
+        batch.begin();
+
+        //draw Background
+        Background background = gameController.getBackground();
+        batch.draw(backgroundTexture,
+                background.getX(),
+                background.getY(),
+                background.getWidth(),
+                background.getHeight());
+
+        //draw player
+        Player player = gameController.getPlayer();
+        batch.draw(playerTexture,
+                player.getX(),
+                player.getY(),
+                player.getWidth(),
+                player.getHeight());
+
+        for(Obstacle obstacle: gameController.getObstacles()){
+            batch.draw(obstacleTexture,
+                    obstacle.getX(),
+                    obstacle.getY(),
+                    obstacle.getWidth(),
+                    obstacle.getHeight());
+        }
+
+        batch.end();
+    }
 
     private void renderUI() {
         hudViewport.apply();

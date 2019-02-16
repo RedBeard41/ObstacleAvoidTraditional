@@ -1,8 +1,12 @@
 package com.obstacleavoid.Screen;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Logger;
+import com.badlogic.gdx.utils.Pool;
+import com.badlogic.gdx.utils.Pools;
+import com.obstacleavoid.Entity.Background;
 import com.obstacleavoid.Entity.Obstacle;
 import com.obstacleavoid.Entity.Player;
 import com.obstacleavoid.config.DifficultyLevel;
@@ -18,31 +22,44 @@ public class GameController {
     private Player player;
     //private boolean isAlive = true;
     private Array<Obstacle> obstacles = new Array<Obstacle>();
+    private Background background;
+
     private float obstacleTimer = 0f;
     private float scoreTimer = 0f;
     private int score;
     private int displayScore;
-    private DifficultyLevel difficultyLevel = DifficultyLevel.HARD;
+    private DifficultyLevel difficultyLevel = DifficultyLevel.EASY;
     private int lives = GameConfig.LIVES_START;
+    private Pool<Obstacle> obstaclePool;
+    private final float startPlayerX = (GameConfig.WORLD_WIDTH - GameConfig.PLAYER_SIZE) / 2f;
+    private final float startPlayerY = 1 - GameConfig.PLAYER_SIZE / 2f;
+
+    private GameInput gameInput;
 
 
     // constructor
-    public GameController() {
+    public GameController(GameInput gameInput) {
+        this.gameInput = gameInput;
         init();
     }
 
     //init
     private void init() {
+
+
         //create player
         player = new Player();
 
-        //calculate position
-        float startPlayerX = GameConfig.WORLD_WIDTH / 2;
-        float startPlayerY = 1;
-
-
         //position player
         player.setPosition(startPlayerX, startPlayerY);
+
+        //create obstacle pool
+        obstaclePool = Pools.get(Obstacle.class, 15);
+
+        //create background
+        background = new Background();
+        background.setPosition(0, 0);
+        background.setSize(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT);
 
     }
 
@@ -50,7 +67,7 @@ public class GameController {
     public void update(float delta) {
 
         if (isGameOver()) {
-            log.debug("Game Over!");
+
             return;
         }
 
@@ -62,6 +79,12 @@ public class GameController {
         if (isPlayerCollidingWithObstacle()) {
             log.debug("Collision detected");
             lives--;
+
+            if (isGameOver()) {
+                log.debug("Game Over");
+            } else {
+                restart();
+            }
         }
 
     }
@@ -74,6 +97,10 @@ public class GameController {
         return obstacles;
     }
 
+    public Background getBackground() {
+        return background;
+    }
+
     public int getDisplayScore() {
         return displayScore;
     }
@@ -83,10 +110,18 @@ public class GameController {
     }
 
     //private methods
+
+    private void restart() {
+        obstaclePool.freeAll(obstacles);
+        obstacles.clear();
+        player.setPosition(startPlayerX, startPlayerY);
+
+    }
+
     private boolean isGameOver() {
 
-       // return lives <= 0;
-        return false;
+        return lives <= 0;
+
     }
 
     private void updateScore(float delta) {
@@ -117,8 +152,9 @@ public class GameController {
     }
 
     private void blockPlayerFromLeavingTheWorld() {
-        float playerX = MathUtils.clamp(player.getX(), player.getWidth() / 2f,
-                GameConfig.WORLD_WIDTH - player.getWidth() / 2f);
+        float playerX = MathUtils.clamp(player.getX(),
+                0,
+                GameConfig.WORLD_WIDTH - player.getWidth());
 
         /*if(playerX < player.getWidth()/2f){
             playerX = player.getWidth()/2f;
@@ -139,14 +175,15 @@ public class GameController {
         removePassedObstacles();
     }
 
-    private void removePassedObstacles(){
-        if(obstacles.size>0){
+    private void removePassedObstacles() {
+        if (obstacles.size > 0) {
             Obstacle first = obstacles.first();
 
-            float minObstacleY = -Obstacle.SIZE;
+            float minObstacleY = -GameConfig.OBSTACLE_SIZE;
 
-            if(first.getY() < minObstacleY){
-                obstacles.removeValue(first,true);
+            if (first.getY() < minObstacleY) {
+                obstacles.removeValue(first, true);
+                obstaclePool.free(first);
             }
         }
     }
@@ -155,12 +192,13 @@ public class GameController {
         obstacleTimer += delta;
 
         if (obstacleTimer >= GameConfig.OBSTACLE_SPAWN_TIME) {
-            float min = 0f+Obstacle.SIZE/2f;
-            float max = GameConfig.WORLD_WIDTH-Obstacle.SIZE/2f;
+            float min = 0f;
+            float max = GameConfig.WORLD_WIDTH - GameConfig.OBSTACLE_SIZE;
             float obstacleX = MathUtils.random(min, max);
+
             float obstacleY = GameConfig.WORLD_HEIGHT;
 
-            Obstacle obstacle = new Obstacle();
+            Obstacle obstacle = obstaclePool.obtain();
             obstacle.setYSpeed(difficultyLevel.getObstacleSpeed());
             obstacle.setPosition(obstacleX, obstacleY);
 
@@ -171,7 +209,25 @@ public class GameController {
 
     private void updatePlayer() {
         //log.debug("playerX: "+ player.getX() + " playerY: "+ player.getY());
-        player.update();
+
+        float xSpeed = 0;
+
+
+        if (gameInput.isRight()) {
+            xSpeed = GameConfig.MAX_PLAYER_X_SPEED;
+        }
+
+        if (gameInput.isLeft()) {
+            xSpeed = -GameConfig.MAX_PLAYER_X_SPEED;
+        }
+
+        if (Gdx.input.isTouched()) {
+            float xTouch = gameInput.getTouch().x;
+            xSpeed = xTouch < player.getX() ? -GameConfig.MAX_PLAYER_X_SPEED : GameConfig.MAX_PLAYER_X_SPEED;
+        }
+
+        player.setX(player.getX() + xSpeed);
+
 
     }
 }

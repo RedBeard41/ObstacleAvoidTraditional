@@ -1,15 +1,13 @@
 package com.obstacleavoid.Entity;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
-import com.obstacleavoid.config.DifficultyLevel;
+import com.badlogic.gdx.utils.Pool;
 import com.obstacleavoid.config.GameConfig;
 
-public class Obstacle extends GameObjectBase {
+public class Obstacle extends GameObjectBase implements Pool.Poolable{
 
-    private static final float BOUNDS_RADIUS = 0.4f; //world units
-    public static final float SIZE = 2 * BOUNDS_RADIUS;
+
 
 
     private float ySpeed = GameConfig.EASY_OBSTACLE_SPEED;
@@ -17,7 +15,8 @@ public class Obstacle extends GameObjectBase {
 
 
     public Obstacle() {
-        super(BOUNDS_RADIUS);
+        super(GameConfig.OBSTACLE_BOUNDS_RADIUS);
+        setSize(GameConfig.OBSTACLE_SIZE,GameConfig.OBSTACLE_SIZE);
 
     }
 
@@ -30,13 +29,10 @@ public class Obstacle extends GameObjectBase {
 
 
 
-    public float getWidth() {
-        return SIZE;
-    }
 
     public boolean isPlayerColliding(Player player) {
         Circle playerBounds = player.getBounds();
-        boolean overlaps = Intersector.overlaps(playerBounds,getBounds());
+        boolean overlaps = Intersector.overlaps(playerBounds, getBounds());
 
         hit = overlaps;
 
@@ -49,5 +45,10 @@ public class Obstacle extends GameObjectBase {
 
     public void setYSpeed(float YSpeed) {
         this.ySpeed = YSpeed;
+    }
+
+    @Override
+    public void reset() {
+        hit = false;
     }
 }
