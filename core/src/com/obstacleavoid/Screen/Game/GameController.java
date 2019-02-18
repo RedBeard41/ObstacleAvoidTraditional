@@ -1,4 +1,4 @@
-package com.obstacleavoid.Screen;
+package com.obstacleavoid.Screen.Game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;

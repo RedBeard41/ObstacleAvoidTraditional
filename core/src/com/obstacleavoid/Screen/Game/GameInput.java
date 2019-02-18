@@ -1,4 +1,4 @@
-package com.obstacleavoid.Screen;
+package com.obstacleavoid.Screen.Game;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;

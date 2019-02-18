@@ -1,15 +1,16 @@
-package com.obstacleavoid.Screen;
+package com.obstacleavoid.Screen.Game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.obstacleavoid.ObstacleAvoidGame;
-import com.obstacleavoid.assets.AssetDescriptors;
 import com.obstacleavoid.config.GameConfig;
 
 public class GameScreen implements Screen {
+    private static final Logger log = new Logger(GameScreen.class.getSimpleName(), Logger.DEBUG);
 
     private final ObstacleAvoidGame game;
     private final AssetManager assetManager;
@@ -27,19 +28,24 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
+        log.debug("show");
 
+        //moving to loading screen
+       /* waitMillis(800);
         assetManager.load(AssetDescriptors.FONT);
+        waitMillis(800);
         assetManager.load(AssetDescriptors.GAME_PLAY);
-       /* assetManager.load(AssetDescriptors.BACKGROUND);
+        waitMillis(800);
+       *//* assetManager.load(AssetDescriptors.BACKGROUND);
         assetManager.load(AssetDescriptors.PLAYER);
-        assetManager.load(AssetDescriptors.OBSTACLE);*/
+        assetManager.load(AssetDescriptors.OBSTACLE);*//*
 
-        assetManager.finishLoading();
+        assetManager.finishLoading();*/
 
         gameViewPort = new FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT);
         gameInput = new GameInput(gameViewPort);
         gameController = new GameController(gameInput);
-        renderer = new GameRenderer(gameController,gameViewPort,assetManager);
+        renderer = new GameRenderer(gameController, gameViewPort, assetManager);
 
         Gdx.input.setInputProcessor(gameInput);
 
@@ -71,6 +77,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void hide() {
+        log.debug("hide");
 
     }
 
@@ -79,4 +86,6 @@ public class GameScreen implements Screen {
         renderer.dispose();
 
     }
+
+
 }

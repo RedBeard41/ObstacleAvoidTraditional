@@ -1,6 +1,5 @@
-package com.obstacleavoid.Screen;
+package com.obstacleavoid.Screen.Game;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -80,7 +79,7 @@ public class GameRenderer implements Disposable {
     //public methods
     public void render(float delta){
         //setting to 0, so we can see how many texture swaps are occuring;
-        batch.totalRenderCalls = 0;
+        //batch.totalRenderCalls = 0;
 
 
         //debug camera controller input
@@ -102,7 +101,7 @@ public class GameRenderer implements Disposable {
         //render debug graphics
         renderDebug();
 
-        Gdx.app.log("Rendering", "total Render Calls: "+ batch.totalRenderCalls);
+        //Gdx.app.log("Rendering", "total Render Calls: "+ batch.totalRenderCalls);
     }
 
 
