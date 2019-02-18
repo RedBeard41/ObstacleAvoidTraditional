@@ -4,7 +4,7 @@ import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 
 public class AssetPacker {
 
-    private static final boolean DRAW_DEBUG_OUTLINE = true;
+    private static final boolean DRAW_DEBUG_OUTLINE = false;
 
     private static final String RAW_ASSETS_PATH = "desktop/assets-raw";
 

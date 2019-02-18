@@ -29,9 +29,10 @@ public class GameScreen implements Screen {
     public void show() {
 
         assetManager.load(AssetDescriptors.FONT);
-        assetManager.load(AssetDescriptors.BACKGROUND);
+        assetManager.load(AssetDescriptors.GAME_PLAY);
+       /* assetManager.load(AssetDescriptors.BACKGROUND);
         assetManager.load(AssetDescriptors.PLAYER);
-        assetManager.load(AssetDescriptors.OBSTACLE);
+        assetManager.load(AssetDescriptors.OBSTACLE);*/
 
         assetManager.finishLoading();
 

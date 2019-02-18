@@ -3,10 +3,11 @@ package com.obstacleavoid.Screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
@@ -16,7 +17,7 @@ import com.obstacleavoid.Entity.Background;
 import com.obstacleavoid.Entity.Obstacle;
 import com.obstacleavoid.Entity.Player;
 import com.obstacleavoid.assets.AssetDescriptors;
-import com.obstacleavoid.assets.AssetPaths;
+import com.obstacleavoid.assets.RegionNames;
 import com.obstacleavoid.config.GameConfig;
 import com.obstacleavoid.util.GdxUtils;
 import com.obstacleavoid.util.ViewportUtils;
@@ -41,9 +42,9 @@ public class GameRenderer implements Disposable {
     private GameInput gameInput;
 
     private final AssetManager assetManager;
-    private Texture playerTexture;
-    private Texture obstacleTexture;
-    private Texture backgroundTexture;
+    private TextureRegion playerRegion;
+    private TextureRegion obstacleRegion;
+    private TextureRegion backgroundRegion;
 
     public GameRenderer(GameController gameController, Viewport viewport, AssetManager assetManager) {
         this.assetManager = assetManager;
@@ -68,14 +69,20 @@ public class GameRenderer implements Disposable {
         debugCameraController = new DebugCameraController();
         debugCameraController.setStartPosition(GameConfig.WORLD_CENTER_X, GameConfig.WORLD_CENTER_Y);
 
-        playerTexture = assetManager.get(AssetDescriptors.PLAYER);
-        obstacleTexture = assetManager.get(AssetDescriptors.OBSTACLE);
-        backgroundTexture = assetManager.get(AssetDescriptors.BACKGROUND);
+        TextureAtlas atlas = assetManager.get(AssetDescriptors.GAME_PLAY);
+
+        playerRegion = atlas.findRegion(RegionNames.PLAYER);
+        obstacleRegion = atlas.findRegion(RegionNames.OBSTACLE);
+        backgroundRegion = atlas.findRegion(RegionNames.BACKGROUND);
 
     }
 
     //public methods
     public void render(float delta){
+        //setting to 0, so we can see how many texture swaps are occuring;
+        batch.totalRenderCalls = 0;
+
+
         //debug camera controller input
         debugCameraController.handleDebugInput(delta);
         debugCameraController.applyTo(camera);
@@ -94,6 +101,8 @@ public class GameRenderer implements Disposable {
 
         //render debug graphics
         renderDebug();
+
+        Gdx.app.log("Rendering", "total Render Calls: "+ batch.totalRenderCalls);
     }
 
 
@@ -124,7 +133,7 @@ public class GameRenderer implements Disposable {
 
         //draw Background
         Background background = gameController.getBackground();
-        batch.draw(backgroundTexture,
+        batch.draw(backgroundRegion,
                 background.getX(),
                 background.getY(),
                 background.getWidth(),
@@ -132,14 +141,14 @@ public class GameRenderer implements Disposable {
 
         //draw player
         Player player = gameController.getPlayer();
-        batch.draw(playerTexture,
+        batch.draw(playerRegion,
                 player.getX(),
                 player.getY(),
                 player.getWidth(),
                 player.getHeight());
 
         for(Obstacle obstacle: gameController.getObstacles()){
-            batch.draw(obstacleTexture,
+            batch.draw(obstacleRegion,
                     obstacle.getX(),
                     obstacle.getY(),
                     obstacle.getWidth(),
